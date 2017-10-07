@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="sysauto_script">
+    <sysauto_script action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <condition/>
+        <conditional>false</conditional>
+        <name>Find NeedIt Tasks Due Soon</name>
+        <run_as display_value="System Administrator">6816f79cc0a8016401c5a33be04be441</run_as>
+        <run_as_tz/>
+        <run_dayofmonth>1</run_dayofmonth>
+        <run_dayofweek>1</run_dayofweek>
+        <run_period/>
+        <run_start>2017-10-06 13:09:53</run_start>
+        <run_time>1970-01-01 16:05:00</run_time>
+        <run_type>daily</run_type>
+        <script><![CDATA[// Get today's time and date
+var nowAndThen = new GlideDateTime();
+
+// query the database for NeedIt task records with a due date field with older values than right now
+// ONLY return Needit Task records that are not closed complete
+
+gs.info("**== JILL ==**  Right Now = " + nowAndThen);
+
+var due24NITasks = new GlideRecord('x_58872_needit_needit_task');
+due24NITasks.addQuery('due_date','>',nowAndThen);
+nowAndThen.addSeconds(86400);
+gs.info("**== JILL ==**  24 hours from Now = " + nowAndThen);
+
+due24NITasks.addQuery('due_date','<=',nowAndThen);
+due24NITasks.addQuery('state','!=',3);  // JILL - why is this a 3?  where could I have seen the display values versus the real values?
+due24NITasks.query();
+
+
+
+// Write a log message for each of the overdue NeedIt  Task Records
+
+while(due24NITasks.next()){
+	gs.info("**== JILL ==**  Due Soon Needit task record = " + due24NITasks.number + " with state of " + due24NITasks.state + " and a due date of " + due24NITasks.due_date);
+	gs.eventQueue('x_58872_needit.dueSoonNeedItTasks',due24NITasks,due24NITasks.number,gs.getUserName());
+}]]></script>
+        <sys_class_name>sysauto_script</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2017-10-06 13:12:33</sys_created_on>
+        <sys_id>49bbf24f0f21030054bc4cace1050e3e</sys_id>
+        <sys_mod_count>13</sys_mod_count>
+        <sys_name>Find NeedIt Tasks Due Soon</sys_name>
+        <sys_package display_value="NeedIt" source="x_58872_needit">6ead8e780f603200cd674f8ce1050ed1</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</sys_scope>
+        <sys_update_name>sysauto_script_49bbf24f0f21030054bc4cace1050e3e</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2017-10-06 14:15:17</sys_updated_on>
+        <upgrade_safe>false</upgrade_safe>
+    </sysauto_script>
+</record_update>
